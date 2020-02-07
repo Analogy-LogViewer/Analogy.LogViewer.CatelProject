@@ -86,7 +86,12 @@ namespace Analogy.LogViewer.CatelProject
                                 otherdata += line + Environment.NewLine;
                             }
                         }
-
+                        if (!string.IsNullOrEmpty(firstLine))
+                        {
+                            var m = Parse(firstLine);
+                            messages.Add(m);
+                            messagesHandler.AppendMessage(m, Utils.GetFileNameAsDataSource(fileName));
+                        }
                     }
                 }
 

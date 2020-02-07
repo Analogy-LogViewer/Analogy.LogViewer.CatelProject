@@ -14,7 +14,7 @@ namespace Analogy.LogViewer.CatelProject
             //get some data provider
             List<IAnalogyDataProvider> dataProviders = new List<IAnalogyDataProvider>();
             dataProviders.Add(new OfflineDataProvider());
-        
+            Items = dataProviders;
         }
     }
 }

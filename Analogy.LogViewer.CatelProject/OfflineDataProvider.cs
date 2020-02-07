@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Analogy.DataProviders.Extensions;
 using Analogy.Interfaces;
 using Newtonsoft.Json;
 
@@ -28,27 +27,27 @@ namespace Analogy.LogViewer.CatelProject
         public Task InitializeDataProviderAsync(IAnalogyLogger logger)
         {
             LogManager.Instance.SetLogger(logger);
-            if (File.Exists(CatelFileSetting))
-            {
-                try
-                {
-                    LogParserSettings = JsonConvert.DeserializeObject<LogParserSettings>(CatelFileSetting);
-                }
-                catch (Exception ex)
-                {
-                    logger.LogException(ex,"Catel","Error loading file "+CatelFileSetting);
-                    LogParserSettings = new LogParserSettings();
-                    LogParserSettings.Splitter = " ";
-                    LogParserSettings.SupportedFilesExtensions = new List<string> { "*.log" };
-                }
-            }
-            else
-            {
-                LogParserSettings = new LogParserSettings();
-                LogParserSettings.Splitter = " ";
-                LogParserSettings.SupportedFilesExtensions = new List<string> { "*.log" };
+            //if (File.Exists(CatelFileSetting))
+            //{
+            //    try
+            //    {
+            //        LogParserSettings = JsonConvert.DeserializeObject<LogParserSettings>(CatelFileSetting);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        logger.LogException(ex,"Catel","Error loading file "+CatelFileSetting);
+            //        LogParserSettings = new LogParserSettings();
+            //        LogParserSettings.Splitter = " ";
+            //        LogParserSettings.SupportedFilesExtensions = new List<string> { "*.log" };
+            //    }
+            //}
+            //else
+            //{
+            //    LogParserSettings = new LogParserSettings();
+            //    LogParserSettings.Splitter = " ";
+            //    LogParserSettings.SupportedFilesExtensions = new List<string> { "*.log" };
 
-            }
+            //}
             CatelFileParser = new CatelFileParser(LogParserSettings);
             return Task.CompletedTask;
         }
@@ -67,7 +66,7 @@ namespace Analogy.LogViewer.CatelProject
             throw new NotImplementedException();
         }
 
-        public bool CanOpenFile(string fileName) => LogParserSettings.CanOpenFile(fileName);
+        public bool CanOpenFile(string fileName) => true;//LogParserSettings.CanOpenFile(fileName);
 
         public bool CanOpenAllFiles(IEnumerable<string> fileNames) => fileNames.All(CanOpenFile);
         

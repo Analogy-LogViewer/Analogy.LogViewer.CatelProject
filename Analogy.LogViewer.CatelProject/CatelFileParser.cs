@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,12 +14,11 @@ namespace Analogy.LogViewer.CatelProject
     {
         private string source = "Catel";
         private ILogParserSettings LogParserSettings { get; }
-        private string[] splitters;
 
         public CatelFileParser(ILogParserSettings logParserSettings)
         {
+
             LogParserSettings = logParserSettings;
-            splitters = new[] {logParserSettings.Splitter};
         }
 
         public async Task<IEnumerable<AnalogyLogMessage>> Process(string fileName, CancellationToken token,
@@ -32,21 +33,21 @@ namespace Analogy.LogViewer.CatelProject
                     Module = System.Diagnostics.Process.GetCurrentProcess().ProcessName
                 };
                 messagesHandler.AppendMessage(empty, Utils.GetFileNameAsDataSource(fileName));
-                return new List<AnalogyLogMessage> {empty};
+                return new List<AnalogyLogMessage> { empty };
             }
 
-            if (!LogParserSettings.CanOpenFile(fileName))
-            {
-                AnalogyLogMessage empty = new AnalogyLogMessage(
-                    $"File {fileName} Is not supported or not configured correctly in the windows settings",
-                    AnalogyLogLevel.Critical, AnalogyLogClass.General, source, "None")
-                {
-                    Source = source,
-                    Module = System.Diagnostics.Process.GetCurrentProcess().ProcessName
-                };
-                messagesHandler.AppendMessage(empty, Utils.GetFileNameAsDataSource(fileName));
-                return new List<AnalogyLogMessage> {empty};
-            }
+            //if (!LogParserSettings.CanOpenFile(fileName))
+            //{
+            //    AnalogyLogMessage empty = new AnalogyLogMessage(
+            //        $"File {fileName} Is not supported or not configured correctly in the windows settings",
+            //        AnalogyLogLevel.Critical, AnalogyLogClass.General, source, "None")
+            //    {
+            //        Source = source,
+            //        Module = System.Diagnostics.Process.GetCurrentProcess().ProcessName
+            //    };
+            //    messagesHandler.AppendMessage(empty, Utils.GetFileNameAsDataSource(fileName));
+            //    return new List<AnalogyLogMessage> { empty };
+            //}
 
             List<AnalogyLogMessage> messages = new List<AnalogyLogMessage>();
             try
@@ -55,28 +56,37 @@ namespace Analogy.LogViewer.CatelProject
                 {
                     using (var reader = new StreamReader(stream))
                     {
+                        string firstLine = string.Empty;
+                        string otherdata = string.Empty;
                         while (!reader.EndOfStream)
                         {
-                            var line = await reader.ReadLineAsync();
-                            var items = line.Split(splitters, StringSplitOptions.None);
-                            if (items.Length==)
-                            if (line.StartsWith("#Software:", StringComparison.CurrentCultureIgnoreCase) ||
-                                line.StartsWith("#Version:", StringComparison.CurrentCultureIgnoreCase) ||
-                                line.StartsWith("#Date:", StringComparison.CurrentCultureIgnoreCase))
+                            if (string.IsNullOrEmpty(firstLine))
+                                firstLine = await reader.ReadLineAsync();
+                            if (reader.EndOfStream)
                             {
-                                //var headerMsg = HandleHeaderMessage(line, fileName);
-                                //messagesHandler.AppendMessage(headerMsg, Utils.GetFileNameAsDataSource(fileName));
-                                //messages.Add(headerMsg);
+                                var m = Parse(firstLine);
+                                messages.Add(m);
+                                messagesHandler.AppendMessage(m, Utils.GetFileNameAsDataSource(fileName));
                                 continue;
                             }
-
-                           
-                            var entry = Parse(items);
-                            entry.FileName = fileName;
-                            messages.Add(entry);
-                            messagesHandler.AppendMessage(entry, Utils.GetFileNameAsDataSource(fileName));
-
+                            var line = await reader.ReadLineAsync();
+                            if (line.Contains(" => "))
+                            {
+                                string lineToProcess = string.IsNullOrEmpty(firstLine)
+                                    ? otherdata
+                                    : firstLine + Environment.NewLine + otherdata;
+                                var m = Parse(lineToProcess);
+                                messages.Add(m);
+                                messagesHandler.AppendMessage(m, Utils.GetFileNameAsDataSource(fileName));
+                                firstLine = line;
+                                otherdata = string.Empty;
+                            }
+                            else
+                            {
+                                otherdata += line + Environment.NewLine;
+                            }
                         }
+
                     }
                 }
 
@@ -92,22 +102,41 @@ namespace Analogy.LogViewer.CatelProject
                     Module = System.Diagnostics.Process.GetCurrentProcess().ProcessName
                 };
                 messagesHandler.AppendMessage(empty, Utils.GetFileNameAsDataSource(fileName));
-                return new List<AnalogyLogMessage> {empty};
+                return new List<AnalogyLogMessage> { empty };
             }
 
 
         }
-
-        private AnalogyLogMessage Parse(string[] items)
+        private AnalogyLogMessage Parse(string line)
         {
+            int first = line.IndexOf(" => ", StringComparison.InvariantCultureIgnoreCase);
             AnalogyLogMessage m = new AnalogyLogMessage();
-            for (var index = 0; index < items.Length; index++)
+            m.Source = "Catel Log";
+            m.Module = "Catel Log";
+            string datetime = line.Substring(0, first);
+            if (DateTime.TryParse(datetime, out DateTime dateVal))
             {
-                string value = items[index];
-                //string field = columnIndexToName[index];
-                //ActionMapping[field](value, m);
+                m.Date = dateVal;
             }
-
+            string sub = line.Substring(first + 4);
+            int firstSpace = sub.IndexOf(' ');
+            string level = sub.Substring(0, firstSpace);
+            if (level.StartsWith("[INFO]"))
+            {
+                m.Level = AnalogyLogLevel.Event;
+            }
+            else if (level.StartsWith("[ERROR]"))
+            {
+                m.Level = AnalogyLogLevel.Error;
+            }
+            else if (level.StartsWith("[WARNING]"))
+            {
+                m.Level = AnalogyLogLevel.Warning;
+            }
+            sub = sub.Substring(level.Length);
+            int sourceIndex = sub.IndexOf(']')+2;
+            m.Source = sub.Substring(2, sourceIndex);
+           m.Text = sub.Substring(sourceIndex);
             return m;
         }
     }

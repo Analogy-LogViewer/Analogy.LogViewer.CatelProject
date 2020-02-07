@@ -14,7 +14,7 @@ namespace Analogy.LogViewer.CatelProject
     {
   
         public Guid ID { get; }=new Guid("A984AE66-20D1-47A0-8AAE-575D115943E1");
-        public string OptionalTitle { get; } = "CatelProject Offlin log";
+        public string OptionalTitle { get; } = "CatelProject Offline log";
         public bool CanSaveToLogFile { get; } = false;
         public string FileOpenDialogFilters { get; } = "Catel log files|*.log";
         public string FileSaveDialogFilters { get; } = string.Empty;

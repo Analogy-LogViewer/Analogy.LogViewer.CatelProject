@@ -58,6 +58,8 @@ namespace Analogy.LogViewer.CatelProject
                         while (!reader.EndOfStream)
                         {
                             var line = await reader.ReadLineAsync();
+                            var items = line.Split(splitters, StringSplitOptions.None);
+                            if (items.Length==)
                             if (line.StartsWith("#Software:", StringComparison.CurrentCultureIgnoreCase) ||
                                 line.StartsWith("#Version:", StringComparison.CurrentCultureIgnoreCase) ||
                                 line.StartsWith("#Date:", StringComparison.CurrentCultureIgnoreCase))
@@ -68,7 +70,7 @@ namespace Analogy.LogViewer.CatelProject
                                 continue;
                             }
 
-                            var items = line.Split(splitters, StringSplitOptions.None);
+                           
                             var entry = Parse(items);
                             entry.FileName = fileName;
                             messages.Add(entry);

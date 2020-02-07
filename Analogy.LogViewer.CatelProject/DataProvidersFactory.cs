@@ -6,7 +6,7 @@ namespace Analogy.LogViewer.CatelProject
 {
     public class DataProvidersFactory : IAnalogyDataProvidersFactory
     {
-        public string Title { get; } = "Some Title";
+        public string Title { get; } = "Catel Project";
         public IEnumerable<IAnalogyDataProvider> Items { get; }
 
         public DataProvidersFactory()

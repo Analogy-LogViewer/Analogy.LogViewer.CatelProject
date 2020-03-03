@@ -1,18 +1,17 @@
-﻿using System;
+﻿using Analogy.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Analogy.Interfaces;
-using Newtonsoft.Json;
 
 namespace Analogy.LogViewer.CatelProject
 {
-   public class OfflineDataProvider:IAnalogyOfflineDataProvider
+    public class OfflineDataProvider : IAnalogyOfflineDataProvider
     {
-  
-        public Guid ID { get; }=new Guid("A984AE66-20D1-47A0-8AAE-575D115943E1");
+
+        public Guid ID { get; } = new Guid("A984AE66-20D1-47A0-8AAE-575D115943E1");
         public string OptionalTitle { get; } = "CatelProject Offline log";
         public bool CanSaveToLogFile { get; } = false;
         public string FileOpenDialogFilters { get; } = "Catel log files|*.log";
@@ -22,6 +21,7 @@ namespace Analogy.LogViewer.CatelProject
 
         private ILogParserSettings LogParserSettings { get; set; }
         private CatelFileParser CatelFileParser { get; set; }
+        public bool DisableFilePoolingOption { get; } = false;
         private string CatelFileSetting { get; } = "CatelSSettings.json";
 
         public Task InitializeDataProviderAsync(IAnalogyLogger logger)
@@ -69,7 +69,8 @@ namespace Analogy.LogViewer.CatelProject
         public bool CanOpenFile(string fileName) => true;//LogParserSettings.CanOpenFile(fileName);
 
         public bool CanOpenAllFiles(IEnumerable<string> fileNames) => fileNames.All(CanOpenFile);
-        
+
+
         public void MessageOpened(AnalogyLogMessage message)
         {
             throw new NotImplementedException();

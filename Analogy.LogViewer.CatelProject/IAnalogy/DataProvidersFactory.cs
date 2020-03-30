@@ -1,20 +1,18 @@
-﻿using System.Collections.Generic;
-using Analogy.Interfaces;
+﻿using Analogy.Interfaces;
 using Analogy.Interfaces.Factories;
+using System;
+using System.Collections.Generic;
 
 namespace Analogy.LogViewer.CatelProject
 {
     public class DataProvidersFactory : IAnalogyDataProvidersFactory
     {
+        public Guid FactoryId { get; } = PrimaryFactory.Id;
         public string Title { get; } = "Catel Project";
-        public IEnumerable<IAnalogyDataProvider> Items { get; }
 
-        public DataProvidersFactory()
-        {
-            //get some data provider
-            List<IAnalogyDataProvider> dataProviders = new List<IAnalogyDataProvider>();
-            dataProviders.Add(new OfflineDataProvider());
-            Items = dataProviders;
-        }
+        public IEnumerable<IAnalogyDataProvider> DataProviders { get; } =
+            new List<IAnalogyDataProvider> { new OfflineDataProvider() };
+
+
     }
 }

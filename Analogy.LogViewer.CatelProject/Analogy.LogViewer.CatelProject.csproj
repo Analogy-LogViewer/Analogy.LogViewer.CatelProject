@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net471;net472;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net471;net472;netcoreapp3.1</TargetFrameworks>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Analogy.LogViewer.Interfaces" Version="2.4.0" />
+    <PackageReference Include="Analogy.LogViewer.Interfaces" Version="2.4.3" />
     <PackageReference Include="Microsoft.Build.Tasks.Git" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

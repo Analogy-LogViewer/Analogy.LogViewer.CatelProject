@@ -12,7 +12,10 @@ namespace Analogy.LogViewer.CatelProject
     public class OfflineDataProvider : IAnalogyOfflineDataProvider
     {
 
-        public Guid ID { get; } = new Guid("A984AE66-20D1-47A0-8AAE-575D115943E1");
+        public Guid Id { get; } = new Guid("A984AE66-20D1-47A0-8AAE-575D115943E1");
+        public Image LargeImage => null;
+        public Image SmallImage => null;
+
         public string OptionalTitle { get; } = "CatelProject Offline log";
         public bool CanSaveToLogFile { get; } = false;
         public string FileOpenDialogFilters { get; } = "Catel log files|*.log";

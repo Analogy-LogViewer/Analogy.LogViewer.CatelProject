@@ -128,7 +128,7 @@ namespace Analogy.LogViewer.CatelProject
             string level = sub.Substring(0, firstSpace);
             if (level.StartsWith("[INFO]"))
             {
-                m.Level = AnalogyLogLevel.Event;
+                m.Level = AnalogyLogLevel.Information;
             }
             else if (level.StartsWith("[ERROR]"))
             {

@@ -7,51 +7,106 @@ namespace Analogy.LogViewer.CatelProject
 {
     public class LogManager : IAnalogyLogger
     {
-        private static Lazy<LogManager> _instance = new Lazy<LogManager>();
-        public static LogManager Instance => _instance.Value;
+        private static Lazy<LogManager> _instance = new Lazy<LogManager>(() => new LogManager());
+
         private IAnalogyLogger Logger { get; set; }
-
-        public void SetLogger(IAnalogyLogger logger) => Logger = logger;
-
-        public void LogEvent(string source, string message, string memberName = "", int lineNumber = 0,
-            string filePath = "")
+        public static LogManager Instance { get; } = _instance.Value;
+        private List<(AnalogyLogLevel level, string source, string message, string memberName, int lineNumber, string filePath)> PendingMessages { get; set; }
+        public LogManager()
         {
-            Logger.LogEvent(source, message, memberName, lineNumber, filePath);
+            PendingMessages = new List<(AnalogyLogLevel level, string source, string message, string memberName, int lineNumber, string filePath)>();
         }
 
-        public void LogWarning(string source, string message, string memberName = "", int lineNumber = 0,
-            string filePath = "")
+        public void SetLogger(IAnalogyLogger logger)
         {
-            Logger.LogWarning(source, message, memberName, lineNumber, filePath);
+            Logger = logger;
+            foreach ((AnalogyLogLevel level, string source, string message, string memberName, int lineNumber, string filePath) in PendingMessages)
+            {
+                switch (level)
+                {
+
+
+                    case AnalogyLogLevel.Debug:
+                        logger.LogDebug(message, source, memberName, lineNumber, filePath);
+                        break;
+                    case AnalogyLogLevel.Information:
+                        logger.LogInformation(message, source, memberName, lineNumber, filePath);
+                        break;
+                    case AnalogyLogLevel.Warning:
+                        logger.LogWarning(message, source, memberName, lineNumber, filePath);
+                        break;
+                    case AnalogyLogLevel.Error:
+                        logger.LogError(message, source, memberName, lineNumber, filePath);
+                        break;
+                    case AnalogyLogLevel.Critical:
+                        logger.LogCritical(message, source, memberName, lineNumber, filePath);
+                        break;
+                    default:
+                        logger.LogInformation(message, source, memberName, lineNumber, filePath);
+                        break;
+                }
+            }
         }
 
-        public void LogDebug(string source, string message, string memberName = "", int lineNumber = 0,
-            string filePath = "")
+        public void LogInformation(string message, string source, string memberName = "", int lineNumber = 0, string filePath = "")
         {
-            Logger.LogDebug(source, message, memberName, lineNumber, filePath);
+            if (Logger == null)
+            {
+                PendingMessages.Add((AnalogyLogLevel.Information, source, message, memberName, lineNumber, filePath));
+            }
+            else
+                Logger.LogInformation(message, source, memberName, lineNumber, filePath);
         }
 
-        public void LogError(string source, string message, string memberName = "", int lineNumber = 0,
-            string filePath = "")
+        public void LogWarning(string message, string source, string memberName = "", int lineNumber = 0, string filePath = "")
         {
-            Logger.LogError(source, message, memberName, lineNumber, filePath);
+            if (Logger == null)
+            {
+                PendingMessages.Add((AnalogyLogLevel.Warning, source, message, memberName, lineNumber, filePath));
+            }
+            else
+                Logger.LogWarning(message, source, memberName, lineNumber, filePath);
         }
 
-        public void LogCritical(string source, string message, string memberName = "", int lineNumber = 0,
-            string filePath = "")
+        public void LogDebug(string message, string source, string memberName = "", int lineNumber = 0, string filePath = "")
         {
-            Logger.LogCritical(source, message, memberName, lineNumber, filePath);
+            if (Logger == null)
+            {
+                PendingMessages.Add((AnalogyLogLevel.Debug, source, message, memberName, lineNumber, filePath));
+            }
+            else
+                Logger.LogDebug(message, source, memberName, lineNumber, filePath);
         }
 
-        public void LogException(Exception ex, string source, string message, string memberName = "",
-            int lineNumber = 0,
-            string filePath = "")
+        public void LogError(string message, string source, string memberName = "", int lineNumber = 0, string filePath = "")
         {
-            Logger.LogException(ex, source, message, memberName, lineNumber, filePath);
+            if (Logger == null)
+            {
+                PendingMessages.Add((AnalogyLogLevel.Error, source, message, memberName, lineNumber, filePath));
+            }
+            else
+                Logger.LogError(message, source, memberName, lineNumber, filePath);
         }
 
+        public void LogCritical(string message, string source, string memberName = "", int lineNumber = 0, string filePath = "")
+        {
+            if (Logger == null)
+            {
+                PendingMessages.Add((AnalogyLogLevel.Critical, source, message, memberName, lineNumber, filePath));
+            }
+            else
+                Logger.LogCritical(message, source, memberName, lineNumber, filePath);
+        }
 
-
+        public void LogException(string message, Exception ex, string source, string memberName = "", int lineNumber = 0,
+            string filePath = "")
+        {
+            if (Logger == null)
+            {
+                PendingMessages.Add((AnalogyLogLevel.Error, source, $"Error: {message.Length }Exception: {ex}", memberName, lineNumber, filePath));
+            }
+            else
+                Logger.LogException(message, ex, source, memberName, lineNumber, filePath);
+        }
     }
 }
-   

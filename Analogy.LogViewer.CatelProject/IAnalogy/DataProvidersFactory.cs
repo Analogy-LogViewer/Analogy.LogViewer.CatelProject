@@ -7,8 +7,8 @@ namespace Analogy.LogViewer.CatelProject
 {
     public class DataProvidersFactory : IAnalogyDataProvidersFactory
     {
-        public Guid FactoryId { get; } = PrimaryFactory.Id;
-        public string Title { get; } = "Catel Project";
+        public Guid FactoryId { get; set; } = PrimaryFactory.Id;
+        public string Title { get; set; } = "Catel Project";
 
         public IEnumerable<IAnalogyDataProvider> DataProviders { get; } =
             new List<IAnalogyDataProvider> { new OfflineDataProvider() };

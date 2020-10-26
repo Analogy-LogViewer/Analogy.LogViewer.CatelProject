@@ -9,6 +9,11 @@ namespace Analogy.LogViewer.CatelProject
     public class PrimaryFactory : IAnalogyFactory
     {
         internal static Guid Id = new Guid("D2B2AFEB-E103-406D-94F4-059AE9510F68");
+        public void RegisterNotificationCallback(INotificationReporter notificationReporter)
+        {
+            
+        }
+
         public Guid FactoryId { get; set; } = Id;
         public Image LargeImage { get; set; } = null;
         public Image SmallImage { get; set; } = null;
